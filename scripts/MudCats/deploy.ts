@@ -6,7 +6,7 @@ async function main() {
   const lock = await Lock.deploy();
 
   await lock.deployed();
-
+  
   console.log("Contract deployed to:", lock.address);
 }
 
