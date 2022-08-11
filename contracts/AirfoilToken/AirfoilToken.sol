@@ -7,8 +7,8 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
- * Green Satoshi Token
- * @author STEPN
+ * Airfoil Token
+ * @author Airfoil
  */
 contract AirfoilToken is ERC20, ERC20Burnable, Ownable {
     constructor() ERC20("AirfoilToken", "AF") {}
