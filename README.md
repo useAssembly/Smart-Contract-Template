@@ -1,6 +1,7 @@
 # Smart Contract Example Projects - Hardhat
 
 ### MudCats Smart Contract Example
+
 ```ts
 npx hardhat run scripts/MudCats/deploy.ts --network goerli
 
@@ -10,6 +11,7 @@ npx hardhat verify \
 ```
 
 ### Nakedz Smart Contract Example
+
 ```ts
 npx hardhat run scripts/Nakedz/deploy.ts --network goerli
 
@@ -18,7 +20,18 @@ npx hardhat verify \
 --network goerli 0x943ccC0c62FcE3e1B5357458C38bB568408885Ec
 ```
 
+### Airfoil Token Smart Contract Example
+
+```ts
+npx hardhat run scripts/AirfoilToken/deploy.ts --network goerli
+
+npx hardhat verify \
+--contract "contracts/AirfoilToken/AirfoilToken.sol:AirfoilToken" \
+--network goerli 0xa91feE4AAd579697d447ABdf34B48Ba151E9d03d
+```
+
 ### Hardhat Commands
+
 Try running some of the following tasks:
 
 ```shell
@@ -27,7 +40,6 @@ npx hardhat test
 GAS_REPORT=true npx hardhat test
 npx hardhat node
 ```
-
 
 ### Common Errors
 
