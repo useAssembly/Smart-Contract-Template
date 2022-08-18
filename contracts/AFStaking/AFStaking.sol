@@ -123,8 +123,16 @@ contract AFStaking is Ownable, ReentrancyGuard {
         UserInfo storage user = userInfo[msg.sender];
 
         updatePool(0);
+
         user.stakedTokens.push(_tokenId);
+
+        require(
+            pool.nftCollection.ownerOf(_tokenId) == msg.sender,
+            "You don't own this token!"
+        );
+
         pool.nftCollection.transferFrom(msg.sender, address(this), _tokenId);
+
         if (user.stakedTokens.length > 0) {
             uint256 pending = (user.stakedTokens.length *
                 (pool.accAFPerShare)) /
