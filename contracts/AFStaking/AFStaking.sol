@@ -124,6 +124,7 @@ contract AFStaking is Ownable, ReentrancyGuard {
 
         updatePool(0);
         user.stakedTokens.push(_tokenId);
+        pool.nftCollection.transferFrom(msg.sender, address(this), _tokenId);
         if (user.stakedTokens.length > 0) {
             uint256 pending = (user.stakedTokens.length *
                 (pool.accAFPerShare)) /
@@ -176,7 +177,12 @@ contract AFStaking is Ownable, ReentrancyGuard {
             rewardToken.safeTransfer(address(msg.sender), pending);
         }
 
-        // user.stakedTokens[nftIndex] = address(0);
+        // Remove element from array while also ensuring the length of the stakedtokens stays the same
+        user.stakedTokens[nftIndex] = user.stakedTokens[
+            user.stakedTokens.length - 1
+        ];
+        user.stakedTokens.pop();
+
         pool.nftCollection.transferFrom(address(this), msg.sender, _tokenId);
 
         user.rewardDebt =

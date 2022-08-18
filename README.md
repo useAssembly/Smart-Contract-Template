@@ -30,6 +30,16 @@ npx hardhat verify \
 --network goerli 0xa91feE4AAd579697d447ABdf34B48Ba151E9d03d
 ```
 
+### AF Staking Smart Contract Example
+
+```ts
+npx hardhat run scripts/AFStaking/deploy.ts --network goerli
+
+npx hardhat verify \
+--contract "contracts/AFStaking/AFStaking.sol:AFStaking" \
+--network goerli 0x0Ca6b3bE0F50a4198E9A9Fdd2Fc32c16B1e1634e 0x56B382090d916Eb6853550f4219eB9c53A346969 0x1949880dD7C0E68a7AE2A51DE57445737bD217D5 1 7425887
+```
+
 ### Hardhat Commands
 
 Try running some of the following tasks:
