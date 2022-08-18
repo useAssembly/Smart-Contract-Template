@@ -37,8 +37,6 @@ contract AFStaking is Ownable, ReentrancyGuard {
     uint256 public totalAllocPoint = 0;
     // The block number when AF mining starts.
     uint256 public startBlock;
-    // The block number when AF mining ends.
-    uint256 public bonusEndBlock;
 
     event Deposit(address indexed user, uint256 amount);
     event Withdraw(address indexed user, uint256 amount);
@@ -48,13 +46,11 @@ contract AFStaking is Ownable, ReentrancyGuard {
         IERC721 _nftCollection,
         IERC20 _rewardToken,
         uint256 _rewardPerBlock,
-        uint256 _startBlock,
-        uint256 _bonusEndBlock
+        uint256 _startBlock
     ) {
         rewardToken = _rewardToken;
         rewardPerBlock = _rewardPerBlock;
         startBlock = _startBlock;
-        bonusEndBlock = _bonusEndBlock;
 
         // staking pool
         poolInfo.push(
@@ -122,7 +118,7 @@ contract AFStaking is Ownable, ReentrancyGuard {
     }
 
     // Stake nft
-    function deposit(uint256 _tokenId) public payable {
+    function deposit(uint256 _tokenId) public {
         PoolInfo storage pool = poolInfo[0];
         UserInfo storage user = userInfo[msg.sender];
 
