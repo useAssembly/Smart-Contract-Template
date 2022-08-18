@@ -6,54 +6,50 @@ const {
 } = require("@openzeppelin/test-helpers");
 
 describe("Staking", function () {
+  let nftCollectionAddress;
+  let rewardTokenAddress;
   // We define a fixture to reuse the same setup in every test.
   // We use loadFixture to run this setup once, snapshot that state,
   // and reset Hardhat Network to that snapshopt in every test.
-  async function deployAirfoilToken() {
+  async function deployAFStaking() {
     const AirfoilToken = await ethers.getContractFactory("AirfoilToken");
     const airfoilToken = await AirfoilToken.deploy();
+    await airfoilToken.deployed();
+    rewardTokenAddress = airfoilToken.address;
 
-    return { airfoilToken };
+    const NftContract = await ethers.getContractFactory("MudCats");
+    const nftContract = await NftContract.deploy();
+    await nftContract.deployed();
+    nftCollectionAddress = nftContract.address;
+
+    const AFStaking = await ethers.getContractFactory("AFStaking");
+    const latestBlock = await ethers.provider.getBlock("latest");
+    const afStaking = await AFStaking.deploy(
+      nftCollectionAddress,
+      rewardTokenAddress,
+      1,
+      latestBlock.number
+    );
+
+    return { afStaking, nftContract, airfoilToken };
   }
-
-  const deployerAddress = "0x916081C20245D239125e3043A6BA519935610edF";
-  const toAddress = "0x3dB716519Db5CfCaD3d591606e0E2c7D944668eE";
 
   describe("Deployment", function () {
     it("Should deploy contract successfully", async function () {
-      const { airfoilToken } = await loadFixture(deployAirfoilToken);
+      const { afStaking } = await loadFixture(deployAFStaking);
 
-      expect(await airfoilToken.balanceOf(deployerAddress)).to.equal(0);
+      expect(await afStaking.rewardPerBlock()).to.equal(1);
     });
   });
 
-  describe("Minting", function () {
-    it("Should assign initial balance via minting", async function () {
-      const { airfoilToken } = await loadFixture(deployAirfoilToken);
+  describe("Staking", function () {
+    it("Should stake nft token successfully", async function () {
+      const { afStaking, nftContract } = await loadFixture(deployAFStaking);
+      const [owner] = await ethers.getSigners();
 
-      await airfoilToken.mint(deployerAddress, 1000);
-
-      expect(await airfoilToken.balanceOf(deployerAddress)).to.equal(1000);
-    });
-
-    it("Minting should emit transfer event", async function () {
-      const { airfoilToken } = await loadFixture(deployAirfoilToken);
-
-      await expect(airfoilToken.mint(deployerAddress, 1000))
-        .to.emit(airfoilToken, "Transfer")
-        .withArgs(constants.ZERO_ADDRESS, deployerAddress, 1000);
-    });
-  });
-
-  describe("Transfer", function () {
-    it("Should not be able to transfer amount more than balance", async function () {
-      const { airfoilToken } = await loadFixture(deployAirfoilToken);
-
-      await airfoilToken.mint(deployerAddress, 1000);
-
-      await expect(airfoilToken.transfer(toAddress, 1007)).to.be.revertedWith(
-        "ERC20: transfer amount exceeds balance"
-      );
+      await nftContract.flipSale();
+      await nftContract.mint(1);
+      expect(await nftContract.balanceOf(owner.address)).to.equal(1);
     });
   });
 });
