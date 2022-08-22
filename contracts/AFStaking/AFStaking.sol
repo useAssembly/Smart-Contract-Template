@@ -37,8 +37,6 @@ contract AFStaking is Ownable, ReentrancyGuard {
     uint256 public totalAllocPoint = 0;
     // The block number when AF mining starts.
     uint256 public startBlock;
-    // The block number when AF mining ends.
-    uint256 public bonusEndBlock;
 
     event Deposit(address indexed user, uint256 amount);
     event Withdraw(address indexed user, uint256 amount);
@@ -48,13 +46,11 @@ contract AFStaking is Ownable, ReentrancyGuard {
         IERC721 _nftCollection,
         IERC20 _rewardToken,
         uint256 _rewardPerBlock,
-        uint256 _startBlock,
-        uint256 _bonusEndBlock
+        uint256 _startBlock
     ) {
         rewardToken = _rewardToken;
         rewardPerBlock = _rewardPerBlock;
         startBlock = _startBlock;
-        bonusEndBlock = _bonusEndBlock;
 
         // staking pool
         poolInfo.push(
@@ -122,12 +118,21 @@ contract AFStaking is Ownable, ReentrancyGuard {
     }
 
     // Stake nft
-    function deposit(uint256 _tokenId) public payable {
+    function deposit(uint256 _tokenId) public {
         PoolInfo storage pool = poolInfo[0];
         UserInfo storage user = userInfo[msg.sender];
 
         updatePool(0);
+
         user.stakedTokens.push(_tokenId);
+
+        require(
+            pool.nftCollection.ownerOf(_tokenId) == msg.sender,
+            "You don't own this token!"
+        );
+
+        pool.nftCollection.transferFrom(msg.sender, address(this), _tokenId);
+
         if (user.stakedTokens.length > 0) {
             uint256 pending = (user.stakedTokens.length *
                 (pool.accAFPerShare)) /
@@ -180,7 +185,12 @@ contract AFStaking is Ownable, ReentrancyGuard {
             rewardToken.safeTransfer(address(msg.sender), pending);
         }
 
-        // user.stakedTokens[nftIndex] = address(0);
+        // Remove element from array while also ensuring the length of the stakedtokens stays the same
+        user.stakedTokens[nftIndex] = user.stakedTokens[
+            user.stakedTokens.length - 1
+        ];
+        user.stakedTokens.pop();
+
         pool.nftCollection.transferFrom(address(this), msg.sender, _tokenId);
 
         user.rewardDebt =
