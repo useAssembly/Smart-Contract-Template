@@ -27,7 +27,7 @@ module.exports = {
     },
   },
   etherscan: {
-    apiKey: "9C7VC821GQ5T26RZQTEUXRPYR2MR35DRCI",
+    apiKey: "API_KEY",
   },
   gasReporter: {
     currency: "CHF",
